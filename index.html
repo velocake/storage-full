@@ -21,6 +21,8 @@
         <input type="text" id="usernameInput" placeholder="Masukkan Username..." required autocomplete="off">
         <button type="submit" class="btn-primary">Masuk Event 🚀</button>
       </form>
+      <small style="color: #888; display: block; margin-top: 15px;">
+        💡 Tip: Taip <b>ginka</b> untuk masuk sebagai Admin!
       </small>
     </div>
   </div>
@@ -28,7 +30,6 @@
   <!-- PAGE 2: MAIN GALLERY PAGE -->
   <div id="galleryPage" class="page-screen">
     
-    <!-- Background Animated Elements -->
     <div class="bg-shape shape1"></div>
     <div class="bg-shape shape2"></div>
     <div class="bg-shape shape3"></div>
@@ -39,7 +40,10 @@
         Hi, <strong id="displayUsername">User</strong> 
         <span id="adminBadge" class="admin-tag" style="display: none;">👑 ADMIN</span>
       </div>
-      <button id="logoutBtn" class="btn-logout">Logout 🚪</button>
+      <div>
+        <button id="adminUsersBtn" class="btn-admin-view" style="display: none;">👥 Senarai User</button>
+        <button id="logoutBtn" class="btn-logout">Logout 🚪</button>
+      </div>
     </div>
 
     <!-- Header Section -->
@@ -50,92 +54,91 @@
       <button class="btn-cheer" id="cheerBtn">🎉 Party Confetti!</button>
     </header>
 
-    <!-- 3D Carousel Container -->
+    <!-- 3D Carousel Container (Full Direct Root Links) -->
     <main class="gallery-container">
       <div class="carousel-stage">
         <div class="carousel" id="carousel">
 
-          <!-- Gambar 1 hingga 12 (.jpeg) -->
           <div class="card" data-id="1" data-title="Gambar 1" data-img="./gambar1.jpeg">
             <div class="card-inner">
-              <img src="./gambar1.jpeg" alt="Gambar 1" onerror="this.src='https://placehold.co/400x500/ff6b6b/ffffff?text=Gambar+1'">
+              <img src="./gambar1.jpeg" alt="Gambar 1">
               <div class="card-tag">Gambar 1</div>
             </div>
           </div>
 
           <div class="card" data-id="2" data-title="Gambar 2" data-img="./gambar2.jpeg">
             <div class="card-inner">
-              <img src="./gambar2.jpeg" alt="Gambar 2" onerror="this.src='https://placehold.co/400x500/4ecdc4/ffffff?text=Gambar+2'">
+              <img src="./gambar2.jpeg" alt="Gambar 2">
               <div class="card-tag">Gambar 2</div>
             </div>
           </div>
 
           <div class="card" data-id="3" data-title="Gambar 3" data-img="./gambar3.jpeg">
             <div class="card-inner">
-              <img src="./gambar3.jpeg" alt="Gambar 3" onerror="this.src='https://placehold.co/400x500/ffd166/333333?text=Gambar+3'">
+              <img src="./gambar3.jpeg" alt="Gambar 3">
               <div class="card-tag">Gambar 3</div>
             </div>
           </div>
 
           <div class="card" data-id="4" data-title="Gambar 4" data-img="./gambar4.jpeg">
             <div class="card-inner">
-              <img src="./gambar4.jpeg" alt="Gambar 4" onerror="this.src='https://placehold.co/400x500/06d6a0/ffffff?text=Gambar+4'">
+              <img src="./gambar4.jpeg" alt="Gambar 4">
               <div class="card-tag">Gambar 4</div>
             </div>
           </div>
 
           <div class="card" data-id="5" data-title="Gambar 5" data-img="./gambar5.jpeg">
             <div class="card-inner">
-              <img src="./gambar5.jpeg" alt="Gambar 5" onerror="this.src='https://placehold.co/400x500/118ab2/ffffff?text=Gambar+5'">
+              <img src="./gambar5.jpeg" alt="Gambar 5">
               <div class="card-tag">Gambar 5</div>
             </div>
           </div>
 
           <div class="card" data-id="6" data-title="Gambar 6" data-img="./gambar6.jpeg">
             <div class="card-inner">
-              <img src="./gambar6.jpeg" alt="Gambar 6" onerror="this.src='https://placehold.co/400x500/8338ec/ffffff?text=Gambar+6'">
+              <img src="./gambar6.jpeg" alt="Gambar 6">
               <div class="card-tag">Gambar 6</div>
             </div>
           </div>
 
           <div class="card" data-id="7" data-title="Gambar 7" data-img="./gambar7.jpeg">
             <div class="card-inner">
-              <img src="./gambar7.jpeg" alt="Gambar 7" onerror="this.src='https://placehold.co/400x500/ff006e/ffffff?text=Gambar+7'">
+              <img src="./gambar7.jpeg" alt="Gambar 7">
               <div class="card-tag">Gambar 7</div>
             </div>
           </div>
 
           <div class="card" data-id="8" data-title="Gambar 8" data-img="./gambar8.jpeg">
             <div class="card-inner">
-              <img src="./gambar8.jpeg" alt="Gambar 8" onerror="this.src='https://placehold.co/400x500/3a86ff/ffffff?text=Gambar+8'">
+              <img src="./gambar8.jpeg" alt="Gambar 8">
               <div class="card-tag">Gambar 8</div>
             </div>
           </div>
 
           <div class="card" data-id="9" data-title="Gambar 9" data-img="./gambar9.jpeg">
             <div class="card-inner">
-              <img src="./gambar9.jpeg" alt="Gambar 9" onerror="this.src='https://placehold.co/400x500/fb5607/ffffff?text=Gambar+9'">
+              <img src="./gambar9.jpeg" alt="Gambar 9">
               <div class="card-tag">Gambar 9</div>
             </div>
           </div>
 
           <div class="card" data-id="10" data-title="Gambar 10" data-img="./gambar10.jpeg">
             <div class="card-inner">
-              <img src="./gambar10.jpeg" alt="Gambar 10" onerror="this.src='https://placehold.co/400x500/00bbf9/ffffff?text=Gambar+10'">
+              <img src="./gambar10.jpeg" alt="Gambar 10">
               <div class="card-tag">Gambar 10</div>
             </div>
           </div>
 
           <div class="card" data-id="11" data-title="Gambar 11" data-img="./gambar11.jpeg">
             <div class="card-inner">
-              <img src="./gambar11.jpeg" alt="Gambar 11" onerror="this.src='https://placehold.co/400x500/00f5d4/333333?text=Gambar+11'">
+              <img src="./gambar11.jpeg" alt="Gambar 11">
               <div class="card-tag">Gambar 11</div>
             </div>
           </div>
 
           <div class="card" data-id="12" data-title="Gambar 12" data-img="./gambar12.jpeg">
             <div class="card-inner">
-              <img src="./gambar12.jpeg" alt="Gambar 12" onerror="this.src='https://placehold.co/400x500/f15bb5/ffffff?text=Gambar+12'">
+              <img src="./gambar12.jpeg" alt="Gambar 12">
               <div class="card-tag">Gambar 12</div>
             </div>
           </div>
@@ -152,50 +155,48 @@
     </div>
   </div>
 
-  <!-- LIGHTBOX / POPUP GALLERY WITH LIKES & COMMENTS -->
+  <!-- LIGHTBOX / POPUP GALLERY -->
   <div class="lightbox" id="lightbox">
     <div class="lightbox-container">
       <span class="close-btn" id="closeBtn">&times;</span>
       
-      <!-- Bahagian Kiri: Gambar -->
       <div class="lightbox-media">
         <img id="lightboxImg" src="" alt="Zoom Image">
         <h3 id="lightboxTitle">Gambar</h3>
       </div>
 
-      <!-- Bahagian Kanan: Like & Komen -->
       <div class="lightbox-sidebar">
-        
-        <!-- Action Bar: Like Button -->
         <div class="like-section">
           <button id="likeBtn" class="btn-like">❤️ Like Gambar Ini</button>
         </div>
 
-        <!-- Section 1: Senarai Orang Yang Like (DI ATAS) -->
         <div class="likes-container">
           <h4>❤️ Disukai Oleh:</h4>
-          <div id="likesList" class="likes-list">
-            <!-- Username yang like akan muncul kat sini (cth: flash ❤️) -->
-          </div>
+          <div id="likesList" class="likes-list"></div>
         </div>
 
         <hr class="divider">
 
-        <!-- Section 2: Senarai Komen (DI BAWAH LIKE) -->
         <div class="comments-container">
           <h4>💬 Komen:</h4>
-          <div id="commentsList" class="comments-list">
-            <!-- Komen-komen akan muncul kat sini -->
-          </div>
+          <div id="commentsList" class="comments-list"></div>
         </div>
 
-        <!-- Input Komen -->
         <form id="commentForm" class="comment-form">
           <input type="text" id="commentInput" placeholder="Tulis komen..." required autocomplete="off">
           <button type="submit">Hantar</button>
         </form>
-
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL ADMIN: USER LIST -->
+  <div class="lightbox" id="usersModal">
+    <div class="admin-users-card">
+      <span class="close-btn" id="closeUsersBtn">&times;</span>
+      <h3>👑 Senarai User Berdaftar (Admin View)</h3>
+      <p style="font-size:0.85rem; color:#666; margin-bottom:15px;">Semua akaun yang pernah login kat portal ni:</p>
+      <ul id="usersList" class="user-ul"></ul>
     </div>
   </div>
 
