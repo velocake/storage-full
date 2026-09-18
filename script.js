@@ -1,32 +1,31 @@
-// LocalStorage Data Management
 let currentUser = localStorage.getItem('event_user') || null;
 let commentsData = JSON.parse(localStorage.getItem('event_comments')) || {};
 let likesData = JSON.parse(localStorage.getItem('event_likes')) || {};
+let registeredUsers = JSON.parse(localStorage.getItem('event_registered_users')) || [];
 
-// Page Elements
 const loginPage = document.getElementById('loginPage');
 const galleryPage = document.getElementById('galleryPage');
 const loginForm = document.getElementById('loginForm');
 const usernameInput = document.getElementById('usernameInput');
 const displayUsername = document.getElementById('displayUsername');
 const adminBadge = document.getElementById('adminBadge');
+const adminUsersBtn = document.getElementById('adminUsersBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 
-// Active Selected Image State
 let activeImageId = null;
 
-// --- PAGE SYSTEM & LOGIN LOGIC ---
 function checkAuth() {
   if (currentUser) {
     loginPage.classList.remove('active-page');
     galleryPage.classList.add('active-page');
     displayUsername.innerText = currentUser;
 
-    // Check if Admin "ginka"
     if (currentUser.toLowerCase() === 'ginka') {
       adminBadge.style.display = 'inline-block';
+      adminUsersBtn.style.display = 'inline-block';
     } else {
       adminBadge.style.display = 'none';
+      adminUsersBtn.style.display = 'none';
     }
   } else {
     loginPage.classList.add('active-page');
@@ -40,6 +39,12 @@ loginForm.addEventListener('submit', (e) => {
   if (username) {
     currentUser = username;
     localStorage.setItem('event_user', currentUser);
+    
+    if (!registeredUsers.includes(username)) {
+      registeredUsers.push(username);
+      localStorage.setItem('event_registered_users', JSON.stringify(registeredUsers));
+    }
+
     usernameInput.value = '';
     checkAuth();
   }
@@ -51,7 +56,6 @@ logoutBtn.addEventListener('click', () => {
   checkAuth();
 });
 
-// Initial Auth Check
 checkAuth();
 
 // --- 3D CAROUSEL LOGIC ---
@@ -86,13 +90,10 @@ function autoSpin() {
   requestAnimationFrame(autoSpin);
 }
 
-// Drag & Touch Controls
 const container = document.querySelector('.gallery-container');
 
 container.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  startX = e.clientX;
-  dragAngle = currentAngle;
+  isDragging = true; startX = e.clientX; dragAngle = currentAngle;
 });
 
 window.addEventListener('mousemove', (e) => {
@@ -105,9 +106,7 @@ window.addEventListener('mousemove', (e) => {
 window.addEventListener('mouseup', () => { isDragging = false; });
 
 container.addEventListener('touchstart', (e) => {
-  isDragging = true;
-  startX = e.touches[0].clientX;
-  dragAngle = currentAngle;
+  isDragging = true; startX = e.touches[0].clientX; dragAngle = currentAngle;
 });
 
 window.addEventListener('touchmove', (e) => {
@@ -120,13 +119,11 @@ window.addEventListener('touchmove', (e) => {
 window.addEventListener('touchend', () => { isDragging = false; });
 
 document.getElementById('nextBtn').addEventListener('click', () => {
-  currentAngle -= (360 / totalCards);
-  updateCarousel();
+  currentAngle -= (360 / totalCards); updateCarousel();
 });
 
 document.getElementById('prevBtn').addEventListener('click', () => {
-  currentAngle += (360 / totalCards);
-  updateCarousel();
+  currentAngle += (360 / totalCards); updateCarousel();
 });
 
 const toggleBtn = document.getElementById('toggleSpinBtn');
@@ -152,7 +149,6 @@ const commentsList = document.getElementById('commentsList');
 const commentForm = document.getElementById('commentForm');
 const commentInput = document.getElementById('commentInput');
 
-// Open Lightbox for an Image
 cards.forEach(card => {
   card.addEventListener('click', () => {
     activeImageId = card.getAttribute('data-id');
@@ -170,11 +166,9 @@ cards.forEach(card => {
 closeBtn.addEventListener('click', () => { lightbox.classList.remove('active'); });
 lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.classList.remove('active'); });
 
-// Render Likes & Comments
 function renderLikesAndComments() {
   if (!activeImageId) return;
 
-  // 1. Render Likes (DI ATAS)
   const imageLikes = likesData[activeImageId] || [];
   likesList.innerHTML = '';
   
@@ -189,7 +183,6 @@ function renderLikesAndComments() {
     });
   }
 
-  // 2. Render Comments (DI BAWAH)
   const imageComments = commentsData[activeImageId] || [];
   commentsList.innerHTML = '';
 
@@ -201,7 +194,6 @@ function renderLikesAndComments() {
       commentDiv.className = 'comment-item';
       
       let deleteBtnHTML = '';
-      // Admin (ginka) boleh buang mana-mana komen!
       if (currentUser && currentUser.toLowerCase() === 'ginka') {
         deleteBtnHTML = `<button class="btn-delete-comment" onclick="deleteComment(${index})">Padam 🗑️</button>`;
       }
@@ -216,24 +208,21 @@ function renderLikesAndComments() {
   }
 }
 
-// Like Button Action
 likeBtn.addEventListener('click', () => {
   if (!activeImageId || !currentUser) return;
-
   if (!likesData[activeImageId]) likesData[activeImageId] = [];
 
   const userIndex = likesData[activeImageId].indexOf(currentUser);
   if (userIndex === -1) {
-    likesData[activeImageId].push(currentUser); // Add Like
+    likesData[activeImageId].push(currentUser);
   } else {
-    likesData[activeImageId].splice(userIndex, 1); // Unlike
+    likesData[activeImageId].splice(userIndex, 1);
   }
 
   localStorage.setItem('event_likes', JSON.stringify(likesData));
   renderLikesAndComments();
 });
 
-// Submit Comment Action
 commentForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const text = commentInput.value.trim();
@@ -241,17 +230,12 @@ commentForm.addEventListener('submit', (e) => {
 
   if (!commentsData[activeImageId]) commentsData[activeImageId] = [];
 
-  commentsData[activeImageId].push({
-    user: currentUser,
-    text: text
-  });
-
+  commentsData[activeImageId].push({ user: currentUser, text: text });
   localStorage.setItem('event_comments', JSON.stringify(commentsData));
   commentInput.value = '';
   renderLikesAndComments();
 });
 
-// Delete Comment (Global Function for Admin)
 window.deleteComment = function(commentIndex) {
   if (currentUser && currentUser.toLowerCase() === 'ginka' && activeImageId) {
     commentsData[activeImageId].splice(commentIndex, 1);
@@ -260,6 +244,27 @@ window.deleteComment = function(commentIndex) {
   }
 };
 
-// Start 3D Carousel
+// --- ADMIN USERS LIST MODAL LOGIC ---
+const usersModal = document.getElementById('usersModal');
+const closeUsersBtn = document.getElementById('closeUsersBtn');
+const usersList = document.getElementById('usersList');
+
+adminUsersBtn.addEventListener('click', () => {
+  usersList.innerHTML = '';
+  if (registeredUsers.length === 0) {
+    usersList.innerHTML = '<li>Tiada user berdaftar lagi.</li>';
+  } else {
+    registeredUsers.forEach(u => {
+      const li = document.createElement('li');
+      li.innerText = u.toLowerCase() === 'ginka' ? `${u} (Admin 👑)` : u;
+      usersList.appendChild(li);
+    });
+  }
+  usersModal.classList.add('active');
+});
+
+closeUsersBtn.addEventListener('click', () => { usersModal.classList.remove('active'); });
+usersModal.addEventListener('click', (e) => { if (e.target === usersModal) usersModal.classList.remove('active'); });
+
 arrangeCarousel();
 autoSpin();
