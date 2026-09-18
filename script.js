@@ -1,7 +1,25 @@
+// 1. IMPORT FIREBASE SDK
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+// ⚠️ GANTI KOD DI BAWAH DENGAN FIREBASECONFIG KAU SENDIRI DARI STEP 1:
+const firebaseConfig = {
+  apiKey: "PASTE_API_KEY_KAU_KAT_SINI",
+  authDomain: "PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "PROJECT_ID",
+  storageBucket: "PROJECT_ID.appspot.com",
+  messagingSenderId: "NUMBER",
+  appId: "APP_ID"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// STATE MANAGEMENT
 let currentUser = localStorage.getItem('event_user') || null;
-let commentsData = JSON.parse(localStorage.getItem('event_comments')) || {};
-let likesData = JSON.parse(localStorage.getItem('event_likes')) || {};
-let registeredUsers = JSON.parse(localStorage.getItem('event_registered_users')) || [];
+let activeImageId = null;
 
 const loginPage = document.getElementById('loginPage');
 const galleryPage = document.getElementById('galleryPage');
@@ -11,8 +29,6 @@ const displayUsername = document.getElementById('displayUsername');
 const adminBadge = document.getElementById('adminBadge');
 const adminUsersBtn = document.getElementById('adminUsersBtn');
 const logoutBtn = document.getElementById('logoutBtn');
-
-let activeImageId = null;
 
 function checkAuth() {
   if (currentUser) {
@@ -33,6 +49,7 @@ function checkAuth() {
   }
 }
 
+// LOGIN & REGISTER USER TO DATABASE
 loginForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const username = usernameInput.value.trim();
@@ -40,10 +57,11 @@ loginForm.addEventListener('submit', (e) => {
     currentUser = username;
     localStorage.setItem('event_user', currentUser);
     
-    if (!registeredUsers.includes(username)) {
-      registeredUsers.push(username);
-      localStorage.setItem('event_registered_users', JSON.stringify(registeredUsers));
-    }
+    // Save to Firebase Realtime DB
+    set(ref(db, 'users/' + username.replace(/[^a-zA-Z0-9]/g, "_")), {
+      username: username,
+      loginAt: new Date().toISOString()
+    });
 
     usernameInput.value = '';
     checkAuth();
@@ -58,7 +76,7 @@ logoutBtn.addEventListener('click', () => {
 
 checkAuth();
 
-// --- 3D CAROUSEL LOGIC ---
+// 3D CAROUSEL LOGIC
 const carousel = document.getElementById('carousel');
 const cards = document.querySelectorAll('.card');
 const totalCards = cards.length;
@@ -91,40 +109,24 @@ function autoSpin() {
 }
 
 const container = document.querySelector('.gallery-container');
-
-container.addEventListener('mousedown', (e) => {
-  isDragging = true; startX = e.clientX; dragAngle = currentAngle;
-});
-
+container.addEventListener('mousedown', (e) => { isDragging = true; startX = e.clientX; dragAngle = currentAngle; });
 window.addEventListener('mousemove', (e) => {
   if (!isDragging) return;
-  const deltaX = e.clientX - startX;
-  currentAngle = dragAngle + deltaX * 0.4;
+  currentAngle = dragAngle + (e.clientX - startX) * 0.4;
   updateCarousel();
 });
-
 window.addEventListener('mouseup', () => { isDragging = false; });
 
-container.addEventListener('touchstart', (e) => {
-  isDragging = true; startX = e.touches[0].clientX; dragAngle = currentAngle;
-});
-
+container.addEventListener('touchstart', (e) => { isDragging = true; startX = e.touches[0].clientX; dragAngle = currentAngle; });
 window.addEventListener('touchmove', (e) => {
   if (!isDragging) return;
-  const deltaX = e.touches[0].clientX - startX;
-  currentAngle = dragAngle + deltaX * 0.4;
+  currentAngle = dragAngle + (e.touches[0].clientX - startX) * 0.4;
   updateCarousel();
 });
-
 window.addEventListener('touchend', () => { isDragging = false; });
 
-document.getElementById('nextBtn').addEventListener('click', () => {
-  currentAngle -= (360 / totalCards); updateCarousel();
-});
-
-document.getElementById('prevBtn').addEventListener('click', () => {
-  currentAngle += (360 / totalCards); updateCarousel();
-});
+document.getElementById('nextBtn').addEventListener('click', () => { currentAngle -= (360 / totalCards); updateCarousel(); });
+document.getElementById('prevBtn').addEventListener('click', () => { currentAngle += (360 / totalCards); updateCarousel(); });
 
 const toggleBtn = document.getElementById('toggleSpinBtn');
 toggleBtn.addEventListener('click', () => {
@@ -133,12 +135,10 @@ toggleBtn.addEventListener('click', () => {
 });
 
 document.getElementById('cheerBtn').addEventListener('click', () => {
-  if (typeof confetti === 'function') {
-    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-  }
+  if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
 });
 
-// --- LIGHTBOX, LIKES & COMMENTS LOGIC ---
+// REALTIME LIGHTBOX, LIKES & COMMENTS (FIREBASE)
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightboxImg');
 const lightboxTitle = document.getElementById('lightboxTitle');
@@ -152,119 +152,124 @@ const commentInput = document.getElementById('commentInput');
 cards.forEach(card => {
   card.addEventListener('click', () => {
     activeImageId = card.getAttribute('data-id');
-    const imgSrc = card.querySelector('img').src;
-    const title = card.getAttribute('data-title');
-
-    lightboxImg.src = imgSrc;
-    lightboxTitle.innerText = title;
+    lightboxImg.src = card.querySelector('img').src;
+    lightboxTitle.innerText = card.getAttribute('data-title');
     
-    renderLikesAndComments();
+    listenToRealtimeData();
     lightbox.classList.add('active');
   });
 });
 
 closeBtn.addEventListener('click', () => { lightbox.classList.remove('active'); });
-lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.classList.remove('active'); });
 
-function renderLikesAndComments() {
+function listenToRealtimeData() {
   if (!activeImageId) return;
 
-  const imageLikes = likesData[activeImageId] || [];
-  likesList.innerHTML = '';
-  
-  if (imageLikes.length === 0) {
-    likesList.innerHTML = '<span style="font-size:0.8rem; color:#aaa;">Belum ada like.</span>';
-  } else {
-    imageLikes.forEach(user => {
-      const badge = document.createElement('span');
-      badge.className = 'like-badge';
-      badge.innerText = `${user} ❤️`;
-      likesList.appendChild(badge);
-    });
-  }
+  // Listen to Likes Realtime
+  onValue(ref(db, `likes/img_${activeImageId}`), (snapshot) => {
+    const data = snapshot.val() || {};
+    likesList.innerHTML = '';
+    const users = Object.keys(data);
+    if (users.length === 0) {
+      likesList.innerHTML = '<span style="font-size:0.8rem; color:#aaa;">Belum ada like.</span>';
+    } else {
+      users.forEach(u => {
+        const badge = document.createElement('span');
+        badge.className = 'like-badge';
+        badge.innerText = `${data[u]} ❤️`;
+        likesList.appendChild(badge);
+      });
+    }
+  });
 
-  const imageComments = commentsData[activeImageId] || [];
-  commentsList.innerHTML = '';
+  // Listen to Comments Realtime
+  onValue(ref(db, `comments/img_${activeImageId}`), (snapshot) => {
+    const data = snapshot.val() || {};
+    commentsList.innerHTML = '';
+    const keys = Object.keys(data);
+    if (keys.length === 0) {
+      commentsList.innerHTML = '<span style="font-size:0.8rem; color:#aaa;">Belum ada komen. Jadi yang pertama!</span>';
+    } else {
+      keys.forEach(k => {
+        const commentObj = data[k];
+        const commentDiv = document.createElement('div');
+        commentDiv.className = 'comment-item';
+        
+        let deleteBtnHTML = '';
+        if (currentUser && currentUser.toLowerCase() === 'ginka') {
+          deleteBtnHTML = `<button class="btn-delete-comment" data-key="${k}">Padam 🗑️</button>`;
+        }
 
-  if (imageComments.length === 0) {
-    commentsList.innerHTML = '<span style="font-size:0.8rem; color:#aaa;">Belum ada komen. Jadi yang pertama!</span>';
-  } else {
-    imageComments.forEach((commentObj, index) => {
-      const commentDiv = document.createElement('div');
-      commentDiv.className = 'comment-item';
-      
-      let deleteBtnHTML = '';
-      if (currentUser && currentUser.toLowerCase() === 'ginka') {
-        deleteBtnHTML = `<button class="btn-delete-comment" onclick="deleteComment(${index})">Padam 🗑️</button>`;
-      }
+        commentDiv.innerHTML = `
+          <strong>${commentObj.user}</strong>
+          <p>${commentObj.text}</p>
+          ${deleteBtnHTML}
+        `;
+        commentsList.appendChild(commentDiv);
+      });
 
-      commentDiv.innerHTML = `
-        <strong>${commentObj.user}</strong>
-        <p>${commentObj.text}</p>
-        ${deleteBtnHTML}
-      `;
-      commentsList.appendChild(commentDiv);
-    });
-  }
+      // Bind Delete Event for Admin
+      document.querySelectorAll('.btn-delete-comment').forEach(btn => {
+        btn.onclick = () => {
+          const key = btn.getAttribute('data-key');
+          remove(ref(db, `comments/img_${activeImageId}/${key}`));
+        };
+      });
+    }
+  });
 }
 
+// TOGGLE LIKE
 likeBtn.addEventListener('click', () => {
   if (!activeImageId || !currentUser) return;
-  if (!likesData[activeImageId]) likesData[activeImageId] = [];
-
-  const userIndex = likesData[activeImageId].indexOf(currentUser);
-  if (userIndex === -1) {
-    likesData[activeImageId].push(currentUser);
-  } else {
-    likesData[activeImageId].splice(userIndex, 1);
-  }
-
-  localStorage.setItem('event_likes', JSON.stringify(likesData));
-  renderLikesAndComments();
+  const userKey = currentUser.replace(/[^a-zA-Z0-9]/g, "_");
+  const likeRef = ref(db, `likes/img_${activeImageId}/${userKey}`);
+  
+  onValue(likeRef, (snapshot) => {
+    if (snapshot.exists()) {
+      remove(likeRef);
+    } else {
+      set(likeRef, currentUser);
+    }
+  }, { onlyOnce: true });
 });
 
+// ADD COMMENT
 commentForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const text = commentInput.value.trim();
   if (!text || !activeImageId || !currentUser) return;
 
-  if (!commentsData[activeImageId]) commentsData[activeImageId] = [];
-
-  commentsData[activeImageId].push({ user: currentUser, text: text });
-  localStorage.setItem('event_comments', JSON.stringify(commentsData));
+  const newCommentRef = push(ref(db, `comments/img_${activeImageId}`));
+  set(newCommentRef, { user: currentUser, text: text });
   commentInput.value = '';
-  renderLikesAndComments();
 });
 
-window.deleteComment = function(commentIndex) {
-  if (currentUser && currentUser.toLowerCase() === 'ginka' && activeImageId) {
-    commentsData[activeImageId].splice(commentIndex, 1);
-    localStorage.setItem('event_comments', JSON.stringify(commentsData));
-    renderLikesAndComments();
-  }
-};
-
-// --- ADMIN USERS LIST MODAL LOGIC ---
+// ADMIN USERS LIST MODAL
 const usersModal = document.getElementById('usersModal');
 const closeUsersBtn = document.getElementById('closeUsersBtn');
 const usersList = document.getElementById('usersList');
 
 adminUsersBtn.addEventListener('click', () => {
-  usersList.innerHTML = '';
-  if (registeredUsers.length === 0) {
-    usersList.innerHTML = '<li>Tiada user berdaftar lagi.</li>';
-  } else {
-    registeredUsers.forEach(u => {
-      const li = document.createElement('li');
-      li.innerText = u.toLowerCase() === 'ginka' ? `${u} (Admin 👑)` : u;
-      usersList.appendChild(li);
-    });
-  }
-  usersModal.classList.add('active');
+  onValue(ref(db, 'users'), (snapshot) => {
+    const data = snapshot.val() || {};
+    usersList.innerHTML = '';
+    const keys = Object.keys(data);
+    if (keys.length === 0) {
+      usersList.innerHTML = '<li>Tiada user berdaftar lagi.</li>';
+    } else {
+      keys.forEach(k => {
+        const u = data[k].username;
+        const li = document.createElement('li');
+        li.innerText = u.toLowerCase() === 'ginka' ? `${u} (Admin 👑)` : u;
+        usersList.appendChild(li);
+      });
+    }
+    usersModal.classList.add('active');
+  }, { onlyOnce: true });
 });
 
 closeUsersBtn.addEventListener('click', () => { usersModal.classList.remove('active'); });
-usersModal.addEventListener('click', (e) => { if (e.target === usersModal) usersModal.classList.remove('active'); });
 
 arrangeCarousel();
 autoSpin();
