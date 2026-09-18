@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Memories 3D Gallery</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <!-- PAGE 1: LOGIN / REGISTER PAGE -->
+  <div id="loginPage" class="page-screen active-page">
+    <div class="login-card">
+      <div class="badge">🎉 Event Portal</div>
+      <h2>Masuk Dulu Bro! 👋</h2>
+      <p>Masukkan username korang untuk tengok gambar & tinggalkan komen/like.</p>
+      
+      <form id="loginForm">
+        <input type="text" id="usernameInput" placeholder="Masukkan Username..." required autocomplete="off">
+        <button type="submit" class="btn-primary">Masuk Event 🚀</button>
+      </form>
+      </small>
+    </div>
+  </div>
+
+  <!-- PAGE 2: MAIN GALLERY PAGE -->
+  <div id="galleryPage" class="page-screen">
+    
+    <!-- Background Animated Elements -->
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+    <div class="bg-shape shape3"></div>
+
+    <!-- User Header Bar -->
+    <div class="user-bar">
+      <div class="user-info">
+        Hi, <strong id="displayUsername">User</strong> 
+        <span id="adminBadge" class="admin-tag" style="display: none;">👑 ADMIN</span>
+      </div>
+      <button id="logoutBtn" class="btn-logout">Logout 🚪</button>
+    </div>
+
+    <!-- Header Section -->
+    <header class="header">
+      <div class="badge">🎉 Event Recap</div>
+      <h1>Memories & Vibe Check 📸</h1>
+      <p>Drag 3D carousel & klik gambar untuk tengok, like atau komen!</p>
+      <button class="btn-cheer" id="cheerBtn">🎉 Party Confetti!</button>
+    </header>
+
+    <!-- 3D Carousel Container -->
+    <main class="gallery-container">
+      <div class="carousel-stage">
+        <div class="carousel" id="carousel">
+
+          <!-- Gambar 1 hingga 12 (.jpeg) -->
+          <div class="card" data-id="1" data-title="Gambar 1" data-img="images/gambar1.jpeg">
+            <div class="card-inner">
+              <img src="images/gambar1.jpeg" alt="Gambar 1" onerror="this.src='https://placehold.co/400x500/ff6b6b/ffffff?text=Gambar+1'">
+              <div class="card-tag">Gambar 1</div>
+            </div>
+          </div>
+
+          <div class="card" data-id="2" data-title="Gambar 2" data-img="images/gambar2.jpeg">
+            <div class="card-inner">
+              <img src="images/gambar2.jpeg" alt="Gambar 2" onerror="this.src='https://placehold.co/400x500/4ecdc4/ffffff?text=Gambar+2'">
+              <div class="card-tag">Gambar 2</div>
+            </div>
+          </div>
+
+          <div class="card" data-id="3" data-title="Gambar 3" data-img="images/gambar3.jpeg">
+            <div class="card-inner">
+              <img src="images/gambar3.jpeg" alt="Gambar 3" onerror="this.src='https://placehold.co/400x500/ffd166/333333?text=Gambar+3'">
+              <div class="card-tag">Gambar 3</div>
+            </div>
+          </div>
+
+          <div class="card" data-id="4" data-title="Gambar 4" data-img="images/gambar4.jpeg">
+            <div class="card-inner">
+              <img src="images/gambar4.jpeg" alt="Gambar 4" onerror="this.src='https://placehold.co/400x500/06d6a0/ffffff?text=Gambar+4'">
+              <div class="card-tag">Gambar 4</div>
+            </div>
+          </div>
+
+          <div class="card" data-id="5" data-title="Gambar 5" data-img="images/gambar5.jpeg">
+            <div class="card-inner">
+              <img src="images/gambar5.jpeg" alt="Gambar 5" onerror="this.src='https://placehold.co/400x500/118ab2/ffffff?text=Gambar+5'">
+              <div class="card-tag">Gambar 5</div>
+            </div>
+          </div>
+
+          <div class="card" data-id="6" data-title="Gambar 6" data-img="images/gambar6.jpeg">
+            <div class="card-inner">
+              <img src="images/gambar6.jpeg" alt="Gambar 6" onerror="this.src='https://placehold.co/400x500/8338ec/ffffff?text=Gambar+6'">
+              <div class="card-tag">Gambar 6</div>
+            </div>
+          </div>
+
+          <div class="card" data-id="7" data-title="Gambar 7" data-img="images/gambar7.jpeg">
+            <div class="card-inner">
+              <img src="images/gambar7.jpeg" alt="Gambar 7" onerror="this.src='https://placehold.co/400x500/ff006e/ffffff?text=Gambar+7'">
+              <div class="card-tag">Gambar 7</div>
+            </div>
+          </div>
+
+          <div class="card" data-id="8" data-title="Gambar 8" data-img="images/gambar8.jpeg">
+            <div class="card-inner">
+              <img src="images/gambar8.jpeg" alt="Gambar 8" onerror="this.src='https://placehold.co/400x500/3a86ff/ffffff?text=Gambar+8'">
+              <div class="card-tag">Gambar 8</div>
+            </div>
+          </div>
+
+          <div class="card" data-id="9" data-title="Gambar 9" data-img="images/gambar9.jpeg">
+            <div class="card-inner">
+              <img src="images/gambar9.jpeg" alt="Gambar 9" onerror="this.src='https://placehold.co/400x500/fb5607/ffffff?text=Gambar+9'">
+              <div class="card-tag">Gambar 9</div>
+            </div>
+          </div>
+
+          <div class="card" data-id="10" data-title="Gambar 10" data-img="images/gambar10.jpeg">
+            <div class="card-inner">
+              <img src="images/gambar10.jpeg" alt="Gambar 10" onerror="this.src='https://placehold.co/400x500/00bbf9/ffffff?text=Gambar+10'">
+              <div class="card-tag">Gambar 10</div>
+            </div>
+          </div>
+
+          <div class="card" data-id="11" data-title="Gambar 11" data-img="images/gambar11.jpeg">
+            <div class="card-inner">
+              <img src="images/gambar11.jpeg" alt="Gambar 11" onerror="this.src='https://placehold.co/400x500/00f5d4/333333?text=Gambar+11'">
+              <div class="card-tag">Gambar 11</div>
+            </div>
+          </div>
+
+          <div class="card" data-id="12" data-title="Gambar 12" data-img="images/gambar12.jpeg">
+            <div class="card-inner">
+              <img src="images/gambar12.jpeg" alt="Gambar 12" onerror="this.src='https://placehold.co/400x500/f15bb5/ffffff?text=Gambar+12'">
+              <div class="card-tag">Gambar 12</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button id="prevBtn">⬅️ Kiri</button>
+      <button id="toggleSpinBtn">⏸️ Pause Spin</button>
+      <button id="nextBtn">Kanan ➡️</button>
+    </div>
+  </div>
+
+  <!-- LIGHTBOX / POPUP GALLERY WITH LIKES & COMMENTS -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-container">
+      <span class="close-btn" id="closeBtn">&times;</span>
+      
+      <!-- Bahagian Kiri: Gambar -->
+      <div class="lightbox-media">
+        <img id="lightboxImg" src="" alt="Zoom Image">
+        <h3 id="lightboxTitle">Gambar</h3>
+      </div>
+
+      <!-- Bahagian Kanan: Like & Komen -->
+      <div class="lightbox-sidebar">
+        
+        <!-- Action Bar: Like Button -->
+        <div class="like-section">
+          <button id="likeBtn" class="btn-like">❤️ Like Gambar Ini</button>
+        </div>
+
+        <!-- Section 1: Senarai Orang Yang Like (DI ATAS) -->
+        <div class="likes-container">
+          <h4>❤️ Disukai Oleh:</h4>
+          <div id="likesList" class="likes-list">
+            <!-- Username yang like akan muncul kat sini (cth: flash ❤️) -->
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Section 2: Senarai Komen (DI BAWAH LIKE) -->
+        <div class="comments-container">
+          <h4>💬 Komen:</h4>
+          <div id="commentsList" class="comments-list">
+            <!-- Komen-komen akan muncul kat sini -->
+          </div>
+        </div>
+
+        <!-- Input Komen -->
+        <form id="commentForm" class="comment-form">
+          <input type="text" id="commentInput" placeholder="Tulis komen..." required autocomplete="off">
+          <button type="submit">Hantar</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
